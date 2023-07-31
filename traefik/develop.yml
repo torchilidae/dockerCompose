@@ -1,0 +1,51 @@
+version: "3.4"
+
+services:
+  traefik:
+    image: "traefik:latest"
+    networks:
+      - traefik_default
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    command:
+      - "--global.checknewversion=true"
+      - "--global.sendanonymoususage=false"
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      # - "--api.dashboard=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+
+      - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=admin@tsphotoclicks.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/ssl-certs/acme.json"
+
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik_default"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      # - traefik:/etc/traefik
+      - traefik-certs:/ssl-certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  traefik:
+    driver: glusterfs
+    name: "gfs-docker/traefik-certs"
+#   traefik-certs:
+#     driver: glusterfs
+#     name: "gfs-docker/traefik"
+
+networks:
+  traefik_default:
+    external: true
