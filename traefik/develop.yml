@@ -8,6 +8,16 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik-dashboard.tls=true"
+        - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+        - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.docker.tsphotoclicks.net`)"
+        - "traefik.http.routers.traefik-dashboard.service=api@internal"
+        - "traefik.http.routers.traefik-dashboard.tls.domains[0].main=docker.tsphotoclicks.net"
+        - "traefik.http.routers.traefik-dashboard.tls.domains[0].sans=*.docker.tsphotoclicks.net"
+        - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
+        - "traefik.http.services.noop.loadbalancer.server.port=8080"
     command:
       - "--global.checknewversion=true"
       - "--global.sendanonymoususage=false"
@@ -18,10 +28,13 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls.certresolver=myresolver"
+      - "--entrypoints.websecure.http.tls.domains[0].main=docker.tsphotoclicks.net"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=*.docker.tsphotoclicks.net"
 
       - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
       - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=admin@tsphotoclicks.com"
       - "--certificatesresolvers.myresolver.acme.storage=/ssl-certs/acme.json"
 
@@ -29,20 +42,32 @@ services:
       - "--providers.docker.swarmMode=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik_default"
+
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+    secrets:
+      - cf_email
+      - cf_token
+    environment:
+      - "CF_API_EMAIL_FILE=/run/secrets/cf_email"
+      - "CF_DNS_API_TOKEN_FILE=/run/secrets/cf_token"
+
     volumes:
       # - traefik:/etc/traefik
       - traefik-certs:/ssl-certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
+secrets:
+    cf_email:
+      external: true
+    cf_token:
+      external: true
 
 volumes:
-  traefik:
+  traefik-certs:
     driver: glusterfs
     name: "gfs-docker/traefik-certs"
-#   traefik-certs:
+#   traefik:
 #     driver: glusterfs
 #     name: "gfs-docker/traefik"
 
