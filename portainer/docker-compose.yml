@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.4'
 
 services:
   agent:
@@ -12,25 +12,38 @@ services:
       mode: global
       placement:
         constraints: [node.platform.os == linux]
-
   portainer:
     image: portainer/portainer-ce
     command: -H tcp://tasks.agent:9001 --tlsskipverify
-    ports:
-      - "9443:9443"
-      - "9000:9000"
-      - "8000:8000"
+    # ports:
+    #   - "9443:9443"
     volumes:
-      - /mnt/portainer_data:/data
+      - portainer_data:/data
     networks:
       - agent_network
+      - traefik_internal
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.portainer.service=portainer"
+        - "traefik.http.routers.portainer.entrypoints=websecure"
+        - "traefik.http.routers.portainer.tls=true"
+        - "traefik.http.routers.portainer.rule=Host(`portainer.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+        - "traefik.docker.network=traefik_internal"
+
+volumes:
+  portainer_data:
+    driver: glusterfs
+    name: "gfs-docker/portainer_data"
 
 networks:
   agent_network:
     driver: overlay
     attachable: true
+  traefik_internal:
+    external: true

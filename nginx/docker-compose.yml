@@ -6,7 +6,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - traefik_default
+      - traefik_internal
     deploy:
       labels:
         - "traefik.enable=true"
@@ -14,10 +14,7 @@ services:
         - "traefik.http.routers.nginx.tls=true"
         - "traefik.http.routers.nginx.rule=Host(`nginx.docker.tsphotoclicks.net`)"
         - "traefik.http.services.nginx.loadbalancer.server.port=80"
-        # - "traefik.http.routers.nginx.tls.certresolver=myresolver"
-        # - "traefik.http.routers.nginx.tls.domains[0].main=docker.tsphotoclicks.net"
-        # - "traefik.http.routers.nginx.tls.domains[0].sans=*.docker.tsphotoclicks.net"
 
 networks:
-  traefik_default:
+  traefik_internal:
     external: true
