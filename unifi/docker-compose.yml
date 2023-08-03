@@ -1,8 +1,7 @@
 version: "3.4"
 services:
   unifi-controller:
-    image: lscr.io/linuxserver/unifi-controller:latest
-    container_name: unifi-controller
+    image: linuxserver/unifi-controller:latest
     environment:
       - TZ=America/Phoenix
     volumes:
@@ -20,7 +19,7 @@ services:
         - "traefik.http.routers.unifi.entrypoints=websecure"
         - "traefik.http.routers.unifi.tls=true"
         - "traefik.http.routers.unifi.rule=Host(`unifi.docker.tsphotoclicks.net`)"
-        - "traefik.http.services.unifi.loadbalancer.server.port=80"
+        - "traefik.http.services.unifi.loadbalancer.server.port=8443"
         - "traefik.http.services.unifi.loadbalancer.server.scheme=https"
     restart: unless-stopped
 
