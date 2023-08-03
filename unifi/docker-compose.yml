@@ -9,11 +9,14 @@ services:
     volumes:
       - unifi-controller:/config
     ports:
-      - 8443:8443
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
       - 8081:8081
+      - 8443:8443
+      - 8843:8843
+      - 8880:8880
+      - 6789:6789
     networks:
       - traefik_internal
       - unifi_net
