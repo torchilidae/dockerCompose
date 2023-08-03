@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    volumes:
+      - uptime-kuma:/app/data
+    restart: unless-stopped
+    networks:
+      - traefik_internal
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.uptimekuma.entrypoints=websecure"
+        - "traefik.http.routers.uptimekuma.tls=true"
+        - "traefik.http.routers.uptimekuma.rule=Host(`uptimekuma.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.uptimekuma.loadbalancer.server.port=3001"
+
+networks:
+  traefik_internal:
+    external: true
+
+volumes:
+  uptime-kuma:
+    driver: glusterfs
+    name: "gfs-docker/uptime-kuma"
