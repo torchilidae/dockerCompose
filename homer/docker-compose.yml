@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  homer:
+    image: "b4bz/homer:latest"
+    volumes:
+      - homer:/www/assets
+    networks:
+      - traefik_internal
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.homer.entrypoints=websecure"
+        - "traefik.http.routers.homer.tls=true"
+        - "traefik.http.routers.homer.rule=Host(`dashboard.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.homer.loadbalancer.server.port=8080"
+    restart: unless-stopped
+
+networks:
+  traefik_internal:
+    external: true
+
+volumes:
+  homer:
+    driver: glusterfs
+    name: "gfs-docker/homer"
