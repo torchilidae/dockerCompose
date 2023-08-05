@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   homer:
-    image: "b4bz/homer:latest"
+    image: "b4bz/homer"
     volumes:
       - homer:/www/assets
     networks:

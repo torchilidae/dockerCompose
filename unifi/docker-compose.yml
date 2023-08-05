@@ -1,7 +1,7 @@
 version: "3.4"
 services:
   unifi-controller:
-    image: linuxserver/unifi-controller:latest
+    image: linuxserver/unifi-controller
     environment:
       - PUID=1000
       - PGID=1000

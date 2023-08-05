@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma
     volumes:
       - uptime-kuma:/app/data
     restart: unless-stopped
