@@ -6,6 +6,8 @@ services:
     volumes:
       - homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8123:8123
     networks:
       - traefik_internal
     deploy:
