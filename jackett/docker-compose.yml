@@ -1,0 +1,36 @@
+version: "2.1"
+services:
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Phoenix
+      - AUTO_UPDATE=true
+    volumes:
+      - jackett_data:/config
+      - jackett_blackhole:/downloads
+    networks:
+      - traefik_internal
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jackett.entrypoints=websecure"
+        - "traefik.http.routers.jackett.tls=true"
+        - "traefik.http.routers.jackett.rule=Host(`jackett.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+
+
+networks:
+  traefik_internal:
+    external: true
+
+volumes:
+  jackett_data:
+    driver: glusterfs
+    name: "gfs-docker/jackett_data"
+  jackett_blackhole:
+    driver: glusterfs
+    name: "gfs-docker/jackett_blackhole"
