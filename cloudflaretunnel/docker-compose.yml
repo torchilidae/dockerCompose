@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --credentials-file /run/secrets/cloudflare_token run 5a55a184-7321-4efe-a354-b35c3eff93e2
+    restart: always
+    secrets:
+      - cloudflare_token
+
+secrets:
+  cloudflare_token:
+    external: true
