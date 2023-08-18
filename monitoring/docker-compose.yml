@@ -45,7 +45,8 @@ services:
     restart: unless-stopped
     volumes:
       - prometheus-data:/prometheus
-      - prometheus-config/prometheus.yml:/etc/prometheus/prometheus.yml
+    configs:
+      - prometheus-config:/etc/prometheus/prometheus.yml
     networks:
       - monitoring
 
@@ -86,9 +87,10 @@ volumes:
   prometheus-data:
     driver: glusterfs
     name: "gfs-docker/prometheus-data"
+
+configs:
   prometheus-config:
-    driver: glusterfs
-    name: "gfs-docker/prometheus-config"
+    external: true
 
 networks:
   monitoring:
