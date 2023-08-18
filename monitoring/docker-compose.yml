@@ -46,7 +46,8 @@ services:
     volumes:
       - prometheus-data:/prometheus
     configs:
-      - prometheus-config:/etc/prometheus/prometheus.yml
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
     networks:
       - monitoring
 
