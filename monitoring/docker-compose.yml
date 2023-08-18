@@ -5,7 +5,7 @@ services:
     image: grafana/grafana
     deploy:
       replicas: 1
-      restart: unless-stopped
+      
       placement:
         constraints:
           - node.role == manager
@@ -16,6 +16,7 @@ services:
         - "traefik.http.routers.grafana.tls=true"
         - "traefik.http.routers.grafana.rule=Host(`grafana.docker.tsphotoclicks.net`)"
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    restart: unless-stopped
     volumes:
       - type: volume
         source: grafana-data
@@ -34,11 +35,11 @@ services:
       - '--storage.tsdb.retention.time=7d'
     deploy:
       replicas: 1
-      restart: unless-stopped
       placement:
         constraints:
           - node.role == manager
           - node.labels.monitoring == true
+    restart: unless-stopped
     volumes:
       - type: volume
         source: prometheus-data
@@ -59,7 +60,7 @@ services:
       - /dev/disk:/dev/disk:ro                   
     networks:
       - monitoring
-
+  
   node-exporter:
     image: prom/node-exporter
     command:
