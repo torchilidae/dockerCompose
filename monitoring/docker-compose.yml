@@ -1,0 +1,89 @@
+version: "3.8"
+
+services:
+  grafana:
+    image: grafana/grafana
+    deploy:
+      replicas: 1
+      restart: unless-stopped
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.monitoring == true
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.grafana.entrypoints=websecure"
+        - "traefik.http.routers.grafana.tls=true"
+        - "traefik.http.routers.grafana.rule=Host(`grafana.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    volumes:
+      - type: volume
+        source: grafana-data
+        target: /var/lib/grafana
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - monitoring    
+
+  prometheus:
+    image: prom/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=error'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+    deploy:
+      replicas: 1
+      restart: unless-stopped
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.monitoring == true
+    volumes:
+      - type: volume
+        source: prometheus-data
+        target: /prometheus
+    networks:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    command: -logtostderr -docker_only
+    deploy:
+      mode: global
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro                   
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
+    deploy:
+      mode: global
+    volumes:
+      - /:/rootfs:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    networks:
+      - monitoring
+
+volumes:
+  grafana-data:
+    driver: glusterfs
+    name: "gfs-docker/grafana-data"
+  prometheus-data:
+    driver: glusterfs
+    name: "gfs-docker/prometheus-data"      
+
+networks:
+  monitoring:
+    driver: overlay
