@@ -36,9 +36,16 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.prometheus.entrypoints=websecure"
+        - "traefik.http.routers.prometheus.tls=true"
+        - "traefik.http.routers.prometheus.rule=Host(`prometheus.docker.tsphotoclicks.net`)"
+        - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
     restart: unless-stopped
     volumes:
       - prometheus-data:/prometheus
+      - prometheus-config/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - monitoring
 
@@ -78,7 +85,10 @@ volumes:
     name: "gfs-docker/grafana-data"
   prometheus-data:
     driver: glusterfs
-    name: "gfs-docker/prometheus-data"      
+    name: "gfs-docker/prometheus-data"
+  prometheus-config:
+    driver: glusterfs
+    name: "gfs-docker/prometheus-config"
 
 networks:
   monitoring:
