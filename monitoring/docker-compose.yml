@@ -17,9 +17,7 @@ services:
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     restart: unless-stopped
     volumes:
-      - type: volume
-        source: grafana-data
-        target: /var/lib/grafana
+      - grafana-data:/var/lib/grafana
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
@@ -40,9 +38,7 @@ services:
           - node.role == manager
     restart: unless-stopped
     volumes:
-      - type: volume
-        source: prometheus-data
-        target: /prometheus
+      - prometheus-data:/prometheus
     networks:
       - monitoring
 
