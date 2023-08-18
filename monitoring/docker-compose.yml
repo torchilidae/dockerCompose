@@ -23,7 +23,8 @@ services:
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
-      - monitoring    
+      - monitoring
+      - traefik_internal
 
   prometheus:
     image: prom/prometheus
@@ -87,3 +88,5 @@ volumes:
 networks:
   monitoring:
     driver: overlay
+  traefik_internal:
+    external: true
