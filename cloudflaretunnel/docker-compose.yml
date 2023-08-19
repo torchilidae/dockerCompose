@@ -10,5 +10,3 @@ services:
 secrets:
   cloudflare_token:
     external: true
-
-# Testing if the web hooks are working
