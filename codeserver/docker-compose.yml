@@ -23,7 +23,6 @@ services:
         - "traefik.http.routers.vscode.rule=Host(`vscode.docker.tsphotoclicks.net`)"
         - "traefik.http.services.vscode.loadbalancer.server.port=8443"
         - "traefik.http.services.vscode.loadbalancer.server.scheme=https"
-    restart: unless-stopped
     secrets:
       - vscode_token
 
