@@ -13,7 +13,7 @@ services:
       - DEFAULT_WORKSPACE=/workspace #optional
     volumes:
       - gfs-docker:/workspace
-      - gfs-docker/vscode:/config
+      - vscode:/config
     deploy:
       replicas: 1
       labels:
