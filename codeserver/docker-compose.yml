@@ -1,4 +1,3 @@
----
 version: "3.4"
 services:
   code-server:
@@ -9,7 +8,6 @@ services:
       - TZ=America/Phoenix
       - FILE__PASSWORD=/run/secrets/vscode_token #optional
       - FILE__SUDO_PASSWORD=/run/secrets/vscode_token #optional
-#       - PROXY_DOMAIN=vscode.docker.tsphotoclicks.net #optional
       - DEFAULT_WORKSPACE=/workspace #optional
     volumes:
       - gfs-docker:/workspace
@@ -25,6 +23,7 @@ services:
         - "traefik.http.routers.vscode.rule=Host(`vscode.docker.tsphotoclicks.net`)"
         - "traefik.http.services.vscode.loadbalancer.server.port=8443"
         - "traefik.http.services.vscode.loadbalancer.server.scheme=https"
+    restart: unless-stopped
     secrets:
       - vscode_token
 
