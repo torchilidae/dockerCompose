@@ -31,6 +31,9 @@ secrets:
     external: true
 
 volumes:
+  vscode:
+    driver: glusterfs
+    name: "gfs-docker/vscode"
   gfs-docker:
     driver: glusterfs
     name: "gfs-docker"
